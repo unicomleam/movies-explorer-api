@@ -10,7 +10,10 @@ const { NODE_ENV = 'dev_mode', JWT_SECRET } = process.env;
 
 module.exports.getMe = (req, res, next) => {
   User.findById(req.user._id)
-    .then((user) => res.status(OK_STATUS).send({ email: user.email, name: user.name }))
+    .then((user) => {
+      if (!user) throw new NotFoundError('Запрашиваемый пользователь не найден.');
+      else res.status(OK_STATUS).send({ email: user.email, name: user.name });
+    })
     .catch(next);
 };
 
@@ -26,7 +29,7 @@ module.exports.createUser = (req, res, next) => {
       if (err.name === 'ValidationError') {
         return next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
       }
-      if (err.code === 11000) {
+      if (err.code === 11000) { /// numb
         return next(new ConflictError('Пользователь с указанным email уже зарегистрирован.'));
       }
       return next(err);
@@ -38,8 +41,7 @@ module.exports.updateUser = (req, res, next) => {
 
   User.findByIdAndUpdate(req.user._id, { name, email }, { new: true, runValidators: true })
     .then((user) => {
-      if (!user) throw new NotFoundError('Запрашиваемый пользователь не найден');
-      else res.send({ email: user.email, name: user.name });
+      res.send({ email: user.email, name: user.name });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -54,7 +56,7 @@ module.exports.login = (req, res, next) => {
 
   User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'some-secret-key', { expiresIn: '7d' }); /// some-secret-key
+      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'some-secret-key', { expiresIn: '7d' });
       res.send({ token });
     })
     .catch((err) => { next(err); });

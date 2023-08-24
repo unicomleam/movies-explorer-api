@@ -14,9 +14,7 @@ module.exports.getSavesMovies = (req, res, next) => {
 module.exports.createMovie = (req, res, next) => {
   Movie.create({ owner: req.user._id, ...req.body })
     .then((createdMovie) => {
-      Movie.findById(createdMovie._id)
-        .populate('owner')
-        .then((movie) => res.status(CREATED_STATUS).send(movie));
+      res.status(CREATED_STATUS).send(createdMovie);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
