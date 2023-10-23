@@ -20,7 +20,14 @@ const app = express();
 
 mongoose.connect(DB_URL, {});
 
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'https://api.unicomleam.nomoredomainsicu.ru',
+  ],
+  credentials: true,
+}));
 app.use(helmet());
 app.use(limiter);
 app.use(express.json());
