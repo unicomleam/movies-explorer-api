@@ -25,6 +25,7 @@ app.use(cors({
     'http://localhost:3000',
     'http://localhost:3001',
     'https://api.unicomleam.nomoredomainsicu.ru',
+    'https://unicomleam.nomoredomainsrocks.ru',
   ],
   credentials: true,
 }));
